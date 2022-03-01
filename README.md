@@ -1,2 +1,3 @@
-# pointcloud_classify_and_rank_tool
-Very simple interactive tool that loops through pointclouds and alows you to classify them (object label) and rank their segmentation (good/bad).
+# 3D Tools
+
+Requires Open3D > v0.15
