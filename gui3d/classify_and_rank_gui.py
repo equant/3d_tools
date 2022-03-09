@@ -59,15 +59,17 @@ class ClassifyAndRankGuiApp(gui3d.Gui3DApp):
         self._info_ctrls_parts['plant_name'].text = f"ID:  {self.save_df.iloc[self._pcd_n]['plant_names']}"
         self.update_classify_and_rank_panel()
 
-    def update_classify_and_rank_panel(self):
-        #print(f"[DEBUG] update_classify_and_rank_panel()")
+    def create_classify_and_rank_panel(self):
         dataframe_column_names = [x['name'] for x in self.classify_and_rank_settings['data_columns']]
-        try:
-            new_text = self.save_df.iloc[self._pcd_n][dataframe_column_names].to_markdown()
-        except ImportError:
-            new_text = self.save_df.iloc[self._pcd_n][dataframe_column_names].to_string()
-        self._score_board_label.text = new_text
-        #print(f"{new_text}")
+        for c in dataframe_column_names:
+            self._feedback_grid.add_child(gui.Label(f"{c}:"))
+            self._feedback_grid.add_child(gui.Label(""))
+
+    def update_classify_and_rank_panel(self):
+        dataframe_column_names = [x['name'] for x in self.classify_and_rank_settings['data_columns']]
+        for idx, column in enumerate(dataframe_column_names):
+            value_to_display = str(self.save_df.iloc[self._pcd_n][idx])
+            self._feedback_grid.get_children()[(2*idx)+1].text = value_to_display
         return
 
     def _handle_save_df_from_keystroke(self, d, idx, k):
@@ -149,14 +151,31 @@ class ClassifyAndRankGuiApp(gui3d.Gui3DApp):
         label_ctrls = gui.CollapsableVert("Classify and Rank", 0.25 * em,
                                          gui.Margins(em, 0, 0, 0))
         self._label_ctrls = label_ctrls
-        #mono_font = o3d.visualization.gui.FontDescription(
-                #typeface = "assets/Hack-Regular.ttf",
-                #style = o3d.visualization.gui.FontStyle.NORMAL)
-        #mono_font_id = gui.Application.add_font(mono_font)
-        self._score_board_label = gui.Label("")
-        #self._score_board_label.font_id = mono_font_id
+
+        self._feedback_grid = gui.VGrid(2)
+        #self._feedback_grid.add_child(gui.Label("Trees"))
+        #self._feedback_grid.add_child(gui.Label("12 items"))
+        #self._feedback_grid.add_child(gui.Label("People"))
+        #self._feedback_grid.add_child(gui.Label("2 (93% certainty)"))
+        #self._feedback_grid.add_child(gui.Label("Cars"))
+        #self._feedback_grid.add_child(gui.Label("5 (87% certainty)"))
+        
+        self.create_classify_and_rank_panel()
         self.update_classify_and_rank_panel()
-        self._label_ctrls.add_child(self._score_board_label)
+        self._label_ctrls.add_child(self._feedback_grid)
+
+
+        #tabs = o3d.visualization.gui.TabControl()
+        #tab1 = o3d.visualization.gui.Vert()
+        #tab1.add_child(o3d.visualization.gui.Checkbox("Enable option 1"))
+        #tab1.add_child(o3d.visualization.gui.Checkbox("Enable option 2"))
+        #tab1.add_child(o3d.visualization.gui.Checkbox("Enable option 3"))
+        #tabs.add_tab("Options", tab1)
+        #tab2 = o3d.visualization.gui.Vert()
+        #tab2.add_child(o3d.visualization.gui.Label("No plugins detected"))
+        #tab2.add_stretch()
+        #tabs.add_tab("Plugins", tab2)
+        #self._settings_panel.add_child(tabs)
 
 
         help_ctrls = gui.CollapsableVert("Keyboard Shortcuts", 0.25 * em,
